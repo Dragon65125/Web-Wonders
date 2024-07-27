@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #ffffff; /* Set background color to white */
+    --foreground: 240 10% 3.9%;
+    
+    /* Define other color variables as needed */
+    --card: #ffffff; /* Set card background color to white */
+    --card-foreground: 240 10% 3.9%;
+    --popover: #ffffff; /* Set popover background color to white */
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 12%; /* Adjust as needed */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 97%; /* Adjust as needed */
+    --secondary-foreground: 240 5.9% 12%; /* Adjust as needed */
+    --muted: 240 4.8% 97%; /* Adjust as needed */
+    --muted-foreground: 240 3.8% 48%; /* Adjust as needed */
+    --accent: 240 4.8% 97%; /* Adjust as needed */
+    --accent-foreground: 240 5.9% 12%; /* Adjust as needed */
+    --destructive: 0 86.2% 63.2%; /* Adjust as needed */
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 92%; /* Adjust as needed */
+    --input: 240 5.9% 92%; /* Adjust as needed */
+    --ring: 240 10% 4.9%; /* Adjust as needed */
+
+    /* Keyframes for color shift */
+    --colorShift: colorShift;
+  }
+
+  .dark {
+    --background: #ffffff; /* Set dark mode background color to white */
+    --foreground: 0 0% 98%;
+    --card: #ffffff; /* Set dark mode card background color to white */
+    --card-foreground: 0 0% 98%;
+    --popover: #ffffff; /* Set dark mode popover background color to white */
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 12%;
+    --secondary: 240 3.7% 18.9%; /* Adjust as needed */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 18.9%; /* Adjust as needed */
+    --muted-foreground: 240 5% 66.9%; /* Adjust as needed */
+    --accent: 240 3.7% 18.9%; /* Adjust as needed */
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 64.8% 32.6%; /* Adjust as needed */
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 18.9%; /* Adjust as needed */
+    --input: 240 3.7% 18.9%; /* Adjust as needed */
+    --ring: 240 4.9% 85.9%; /* Adjust as needed */
+  }
+
+  /* Base styles */
+  @layer base {
+    * {
+      @apply border-border;
+    }
+    body {
+      @apply text-foreground;
+      background-color: var(--background);
+      animation: colorShift 15s ease-in-out infinite;
+    }
+    .navbar {
+      background-color: #ffffff; /* Set navbar background color to white */
+      color: #000; /* Example text color, adjust as needed */
+      /* Add other styles as needed */
+    }
+  }
+}
+
+/* Define the keyframes outside the @layer directive */
+@keyframes colorShift {
+  0% { background-color: #ffffff; } /* White */
+  25% { background-color: #f0f0f0; } /* Light Grey */
+  50% { background-color: #ffffff; } /* White */
+  75% { background-color: #f0f0f0; } /* Light Grey */
+  100% { background-color: #ffffff; } /* White */
+}
+

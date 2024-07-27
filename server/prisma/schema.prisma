@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+}
+
+model Customer {
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  password String
+  isActive Boolean @default(true)
+
+  orders Order[]
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vendor {
+  id          Int     @id @default(autoincrement())
+  name        String
+  title       String
+  email       String  @unique
+  password    String
+  description String?
+  phone       String?
+  location    String?
+  isVerified  Boolean @default(false)
+
+  products   Product[]
+  categories Category[]
+  orders     Order[]
+  billboard  Billboard? @relation("VendorBillboard")
+  images     Image[]    @relation("VendorImages")
+
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  vendorId  Int
+  vendor    Vendor     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  products  Product[]
+  billboard Billboard? @relation("CategoryBillboard")
+  images    Image[]    @relation("CategoryImages")
+
+  @@index([vendorId])
+}
+
+model Product {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float   @default(0.00)
+  stock       Int     @default(1)
+  isArchived  Boolean @default(false)
+
+  vendorId   Int
+  vendor     Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  images     String
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vendorId])
+  @@index([categoryId])
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  amount Float       @default(0.00)
+  status      OrderStatus @default(PENDING)
+
+  customerId Int
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vendor     Vendor?     @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  vendorId   Int?
+  orderItems OrderItem[]
+  payment    Payment?
+  shipping   Shipping?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id       Int   @id @default(autoincrement())
+  quantity Int
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id     Int           @id @default(autoincrement())
+  method PaymentMethod @default(ONLINE)
+  pidx       String
+  transactionId       String?
+  payment_url       String
+  status  PaymentStatus @default(PENDING)
+  provider PaymentProvider @default(KHALTI)
+  amount Float         @default(0.00)
+  date   DateTime      @default(now())
+
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId Int   @unique
+  customerId Int
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model Shipping {
+  id            Int       @id @default(autoincrement())
+  address       String
+  city          String
+  state         String
+  shippedDate   DateTime?
+  deliveredDate DateTime?
+
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId Int   @unique
+
+  @@index([orderId])
+}
+
+model Billboard {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+
+  vendor     Vendor?   @relation("VendorBillboard", fields: [vendorId], references: [id], onDelete: SetNull)
+  vendorId   Int?      @unique
+  category   Category? @relation("CategoryBillboard", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId Int?      @unique
+  image      Image?    @relation(fields: [imageId], references: [id])
+  imageId    Int?      @unique
+  createdAt  DateTime  @default(now())
+
+  @@index([vendorId])
+  @@index([categoryId])
+}
+
+model Image {
+  id  Int    @id @default(autoincrement())
+  uri String
+
+  vendor     Vendor?    @relation("VendorImages", fields: [vendorId], references: [id], onDelete: SetNull)
+  vendorId   Int?
+  category   Category?  @relation("CategoryImages", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId Int?
+  billboard  Billboard?
+
+  @@index([vendorId])
+  @@index([categoryId])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+enum PaymentStatus {
+  PENDING
+  FAILED
+  SUCCESS
+}
+
+enum PaymentMethod {
+  ONLINE
+  DELIVERY
+}
+enum PaymentProvider {
+  KHALTI
+  ESEWA
+}
